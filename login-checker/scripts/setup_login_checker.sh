@@ -14,7 +14,7 @@ fi
 
 # Copy login_checker_script to /usr/local/bin/ and make it executable
 cp "./login_checker_script.sh" "LOGIN_CHECKER SCRIPT"
-chmod +x "LOGIN_CHECKER_SCRIPT"
+chmod +x "$LOGIN_CHECKER_SCRIPT"
 
 # Create and restrict log file
 touch "$LOG_FILE"
@@ -24,13 +24,13 @@ chown root:root "$LOG_FILE"
 
 # PAM access to SSH
 PAM_SSHD="/etc/pam.d/sshd"
-if ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_SSHD"; then
+if [[ -f "$PAM_SSHD" ]] && ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_SSHD"; then
 	echo "session optional pam_exec.so $LOGIN_CHECKER_SCRIPT" >> "$PAM_SSHD"
 fi
 
 # PAM access to console login
 PAM_LOGIN="/etc/pam.d/login"
-if ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_LOGIN"; then
+if [[ -f "$PAM_LOGIN" ]] && ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_LOGIN"; then
 	echo "session optional pam.exec.so $CHECKER_SCRIPT" >> "$PAM_LOGIN"
 fi
 
@@ -38,19 +38,19 @@ fi
 
 # GNOME
 PAM_GNOME="/etc/pam.d/gdm-password"
-if [[ -f "$PAM_GNOME"]] && ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_GNOME"; then
+if [[ -f "$PAM_GNOME" ]] && ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_GNOME"; then
 	echo "session optional pam_exec.se $LOGIN_CHECKER_SCRIPT" >> "$PAM_GNOME"
 fi
 
 # LightDM
 PAM_LIGHT="/etc/pam.d/lightdm"
-if [[ -f "$PAM_LIGHT"]] && ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_LIGHT"; then
+if [[ -f "$PAM_LIGHT" ]] && ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_LIGHT"; then
         echo "session optional pam_exec.se $LOGIN_CHECKER_SCRIPT" >> "$PAM_LIGHT"
 fi
 
 #SDDM
 PAM_SDDM="/etc/pam.d/sddm"
-if [[ -f "$PAM_SDDM"]] && ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_SDDM"; then
+if [[ -f "$PAM_SDDM" ]] && ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_SDDM"; then
         echo "session optional pam_exec.se $LOGIN_CHECKER_SCRIPT" >> "$PAM_SDDM"
 fi
 
