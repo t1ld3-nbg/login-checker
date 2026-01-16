@@ -22,16 +22,37 @@ chmod 644 "$LOG_FILE"
 chown root:root "$LOG_FILE"
 
 
-# Give PAM access to SSH
+# PAM access to SSH
 PAM_SSHD="/etc/pam.d/sshd"
 if ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_SSHD"; then
 	echo "session optional pam_exec.so $LOGIN_CHECKER_SCRIPT" >> "$PAM_SSHD"
 fi
 
-# Give PAM access to console login
+# PAM access to console login
 PAM_LOGIN="/etc/pam.d/login"
 if ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_LOGIN"; then
 	echo "session optional pam.exec.so $CHECKER_SCRIPT" >> "$PAM_LOGIN"
 fi
+
+# PAM access to GUI logins
+
+# GNOME
+PAM_GNOME="/etc/pam.d/gdm-password"
+if [[ -f "$PAM_GNOME"]] && ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_GNOME"; then
+	echo "session optional pam_exec.se $LOGIN_CHECKER_SCRIPT" >> "$PAM_GNOME"
+fi
+
+# LightDM
+PAM_LIGHT="/etc/pam.d/lightdm"
+if [[ -f "$PAM_LIGHT"]] && ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_LIGHT"; then
+        echo "session optional pam_exec.se $LOGIN_CHECKER_SCRIPT" >> "$PAM_LIGHT"
+fi
+
+#SDDM
+PAM_SDDM="/etc/pam.d/sddm"
+if [[ -f "$PAM_SDDM"]] && ! grep -q "$LOGIN_CHECKER_SCRIPT" "$PAM_SDDM"; then
+        echo "session optional pam_exec.se $LOGIN_CHECKER_SCRIPT" >> "$PAM_SDDM"
+fi
+
 
 echo "The one-time setup is completed! Login checker will now automatically log all logins."
